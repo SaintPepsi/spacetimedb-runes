@@ -1,7 +1,11 @@
 {
 	"name": "spacetimedb-runes",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/SaintPepsi/spacetimedb-runes.git"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
