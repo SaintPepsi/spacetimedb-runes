@@ -1,3 +1,5 @@
+<img src="./static/sveltespacetimedb.png" alt="Svelte x Spacetimedb" width="250">
+
 # spacetimedb-runes
 
 A type-safe, reactive SpacetimeDB client library for Svelte 5, built with runes. This library is based on the React `useTable` implementation provided by SpacetimeDB.
@@ -34,101 +36,99 @@ First, establish a connection to your SpacetimeDB instance and wrap your app wit
 
 ```svelte
 <script lang="ts">
-  import { SpacetimeDB, SpacetimeDBContext } from 'spacetimedb-runes';
-  import { DbConnection } from '@module_bindings';
-  import type { Identity } from 'spacetimedb';
-  import { onMount } from 'svelte';
+	import { SpacetimeDB, SpacetimeDBContext } from 'spacetimedb-runes';
+	import { DbConnection } from '@module_bindings';
+	import type { Identity } from 'spacetimedb';
+	import { onMount } from 'svelte';
 
-  let connection = $state<DbConnection | null>(null);
+	let connection = $state<DbConnection | null>(null);
 
-  onMount(() => {
-    const onConnect = (conn: DbConnection, identity: Identity, token: string) => {
-      SpacetimeDB.status.set('connected');
-      SpacetimeDB.authToken.current = token;
+	onMount(() => {
+		const onConnect = (conn: DbConnection, identity: Identity, token: string) => {
+			SpacetimeDB.status.set('connected');
+			SpacetimeDB.authToken.current = token;
 
-      // Set up reducer callbacks
-      conn.reducers.onSendMessage(() => {
-        // Message sent callback
-      });
-    };
+			// Set up reducer callbacks
+			conn.reducers.onSendMessage(() => {
+				// Message sent callback
+			});
+		};
 
-    const onDisconnect = () => {
-      SpacetimeDB.status.set('disconnected');
-    };
+		const onDisconnect = () => {
+			SpacetimeDB.status.set('disconnected');
+		};
 
-    const onConnectError = () => {
-      SpacetimeDB.status.set('error');
-    };
+		const onConnectError = () => {
+			SpacetimeDB.status.set('error');
+		};
 
-    const connectionBuilder = DbConnection.builder()
-      .withUri('ws://localhost:3000')
-      .withModuleName('your-module-name')
-      .withToken(SpacetimeDB.authToken.current || undefined)
-      .onConnect(onConnect)
-      .onDisconnect(onDisconnect)
-      .onConnectError(onConnectError);
+		const connectionBuilder = DbConnection.builder()
+			.withUri('ws://localhost:3000')
+			.withModuleName('your-module-name')
+			.withToken(SpacetimeDB.authToken.current || undefined)
+			.onConnect(onConnect)
+			.onDisconnect(onDisconnect)
+			.onConnectError(onConnectError);
 
-    // Set status to 'connecting' before building the connection
-    // This helps TableQuery properly setup subscriptions when the connection becomes active
-    SpacetimeDB.status.set('connecting');
-    connection = connectionBuilder.build();
-  });
+		// Set status to 'connecting' before building the connection
+		// This helps TableQuery properly setup subscriptions when the connection becomes active
+		SpacetimeDB.status.set('connecting');
+		connection = connectionBuilder.build();
+	});
 
-  let status = SpacetimeDB.status;
-  let { children } = $props();
+	let status = SpacetimeDB.status;
+	let { children } = $props();
 </script>
 
 {#if $status === 'connecting'}
-  <div class="status-info">Connecting to SpacetimeDB...</div>
+	<div class="status-info">Connecting to SpacetimeDB...</div>
 {/if}
 
 {#if $status === 'disconnected'}
-  <div class="status-warning">
-    Disconnected from SpacetimeDB. Are you already connected from another tab?
-  </div>
+	<div class="status-warning">
+		Disconnected from SpacetimeDB. Are you already connected from another tab?
+	</div>
 {/if}
 
 {#if $status === 'error'}
-  <div class="status-error">
-    An error occurred while connecting to SpacetimeDB.
-  </div>
+	<div class="status-error">An error occurred while connecting to SpacetimeDB.</div>
 {/if}
 
 {#if connection && $status === 'connected'}
-  <SpacetimeDBContext {connection}>
-    {@render children()}
-  </SpacetimeDBContext>
+	<SpacetimeDBContext {connection}>
+		{@render children()}
+	</SpacetimeDBContext>
 {:else}
-  <p>Initializing connection...</p>
+	<p>Initializing connection...</p>
 {/if}
 
 <style>
-  .status-info,
-  .status-warning,
-  .status-error {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 0.5rem;
-    text-align: center;
-    z-index: 1000;
-  }
+	.status-info,
+	.status-warning,
+	.status-error {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		padding: 0.5rem;
+		text-align: center;
+		z-index: 1000;
+	}
 
-  .status-error {
-    background-color: tomato;
-    color: white;
-  }
+	.status-error {
+		background-color: tomato;
+		color: white;
+	}
 
-  .status-warning {
-    background-color: orange;
-    color: black;
-  }
+	.status-warning {
+		background-color: orange;
+		color: black;
+	}
 
-  .status-info {
-    background-color: deepskyblue;
-    color: white;
-  }
+	.status-info {
+		background-color: deepskyblue;
+		color: white;
+	}
 </style>
 ```
 
@@ -138,19 +138,19 @@ Use the `TableQuery` class to subscribe to table changes:
 
 ```svelte
 <script lang="ts">
-  import { TableQuery } from 'spacetimedb-runes';
+	import { TableQuery } from 'spacetimedb-runes';
 
-  const users = new TableQuery('User');
+	const users = new TableQuery('User');
 </script>
 
 {#if users.state === 'loading'}
-  <p>Loading users...</p>
+	<p>Loading users...</p>
 {:else}
-  <ul>
-    {#each users.rows as user}
-      <li>{user.name}</li>
-    {/each}
-  </ul>
+	<ul>
+		{#each users.rows as user}
+			<li>{user.name}</li>
+		{/each}
+	</ul>
 {/if}
 ```
 
@@ -164,11 +164,11 @@ Here are some helpful SpacetimeDB CLI commands you can add to your `package.json
 
 ```json
 {
-  "scripts": {
-    "generate": "spacetime generate --lang typescript --out-dir ./src/module_bindings --project-path ../spacetimedb",
-    "compile": "cd ../spacetimedb && spacetime build",
-    "publish": "spacetime publish --server local --project-path ../spacetimedb your-module-name"
-  }
+	"scripts": {
+		"generate": "spacetime generate --lang typescript --out-dir ./src/module_bindings --project-path ../spacetimedb",
+		"compile": "cd ../spacetimedb && spacetime build",
+		"publish": "spacetime publish --server local --project-path ../spacetimedb your-module-name"
+	}
 }
 ```
 
@@ -188,16 +188,16 @@ To get full type safety and autocomplete for your database schema, you need to a
 import type { DbConnection } from '@module_bindings';
 
 declare global {
-  namespace App {
-    // ... other App interfaces
-  }
+	namespace App {
+		// ... other App interfaces
+	}
 }
 
 // Augment the spacetimedb-runes Register interface
 declare module 'spacetimedb-runes' {
-  interface Register {
-    connection: DbConnection;
-  }
+	interface Register {
+		connection: DbConnection;
+	}
 }
 
 export {};
@@ -211,12 +211,12 @@ The examples in this README use `@module_bindings` to import SpacetimeDB generat
 
 ```javascript
 const config = {
-  kit: {
-    alias: {
-      '@module_bindings': 'src/module_bindings',
-      // ... other aliases
-    }
-  }
+	kit: {
+		alias: {
+			'@module_bindings': 'src/module_bindings'
+			// ... other aliases
+		}
+	}
 };
 ```
 
@@ -234,25 +234,17 @@ The library provides a callback-based API for building where clauses with **full
 
 ```svelte
 <script lang="ts">
-  import { TableQuery } from 'spacetimedb-runes';
+	import { TableQuery } from 'spacetimedb-runes';
 
-  // Filter users where isActive = true
-  const activeUsers = new TableQuery('User', ({ where, eq }) =>
-    where(eq('isActive', true))
-  );
+	// Filter users where isActive = true
+	const activeUsers = new TableQuery('User', ({ where, eq }) => where(eq('isActive', true)));
 
-  // Complex queries with AND/OR
-  const complexQuery = new TableQuery('User', ({ where, eq, and, or }) =>
-    where(
-      and(
-        eq('role', 'admin'),
-        or(
-          eq('department', 'Engineering'),
-          eq('department', 'Product')
-        )
-      )
-    )
-  );
+	// Complex queries with AND/OR
+	const complexQuery = new TableQuery('User', ({ where, eq, and, or }) =>
+		where(
+			and(eq('role', 'admin'), or(eq('department', 'Engineering'), eq('department', 'Product')))
+		)
+	);
 </script>
 ```
 
@@ -277,11 +269,11 @@ Called when a new row is inserted that matches your query:
 
 ```svelte
 <script lang="ts">
-  const users = new TableQuery('User', undefined, {
-    onInsert: (row) => {
-      console.log('New user added:', row.name);
-    }
-  });
+	const users = new TableQuery('User', undefined, {
+		onInsert: (row) => {
+			console.log('New user added:', row.name);
+		}
+	});
 </script>
 ```
 
@@ -291,11 +283,11 @@ Called when a row that matches your query is updated:
 
 ```svelte
 <script lang="ts">
-  const users = new TableQuery('User', undefined, {
-    onUpdate: (oldRow, newRow) => {
-      console.log(`User ${oldRow.name} updated to ${newRow.name}`);
-    }
-  });
+	const users = new TableQuery('User', undefined, {
+		onUpdate: (oldRow, newRow) => {
+			console.log(`User ${oldRow.name} updated to ${newRow.name}`);
+		}
+	});
 </script>
 ```
 
@@ -305,11 +297,11 @@ Called when a row that matches your query is deleted:
 
 ```svelte
 <script lang="ts">
-  const users = new TableQuery('User', undefined, {
-    onDelete: (row) => {
-      console.log('User deleted:', row.name);
-    }
-  });
+	const users = new TableQuery('User', undefined, {
+		onDelete: (row) => {
+			console.log('User deleted:', row.name);
+		}
+	});
 </script>
 ```
 
@@ -321,17 +313,17 @@ Use this when you need to perform operations on existing data, since `onInsert`,
 
 ```svelte
 <script lang="ts">
-  const users = new TableQuery('User', undefined, {
-    onInitialSnapshot: (rows) => {
-      console.log(`Loaded ${rows.length} existing users from database`);
+	const users = new TableQuery('User', undefined, {
+		onInitialSnapshot: (rows) => {
+			console.log(`Loaded ${rows.length} existing users from database`);
 
-      // Example: Initialize local state based on existing data
-      const userMap = new Map(rows.map(u => [u.id, u]));
-    },
-    onInsert: (row) => {
-      console.log('NEW user inserted:', row);
-    }
-  });
+			// Example: Initialize local state based on existing data
+			const userMap = new Map(rows.map((u) => [u.id, u]));
+		},
+		onInsert: (row) => {
+			console.log('NEW user inserted:', row);
+		}
+	});
 </script>
 ```
 
@@ -351,30 +343,25 @@ The where clause callbacks ensure type safety while building complex queries:
 
 ```svelte
 <script lang="ts">
-  import { TableQuery } from 'spacetimedb-runes';
+	import { TableQuery } from 'spacetimedb-runes';
 
-  const query = new TableQuery(
-    'Task',
-    ({ where, eq, and }) => where(
-      and(
-        eq('status', 'active'),
-        eq('assignedTo', currentUserId)
-      )
-    ),
-    {
-      onInitialSnapshot: (tasks) => {
-        console.log(`You have ${tasks.length} active tasks`);
-      },
-      onInsert: (task) => {
-        showNotification(`New task assigned: ${task.title}`);
-      },
-      onUpdate: (oldTask, newTask) => {
-        if (oldTask.status !== newTask.status) {
-          console.log(`Task ${newTask.title} status changed`);
-        }
-      }
-    }
-  );
+	const query = new TableQuery(
+		'Task',
+		({ where, eq, and }) => where(and(eq('status', 'active'), eq('assignedTo', currentUserId))),
+		{
+			onInitialSnapshot: (tasks) => {
+				console.log(`You have ${tasks.length} active tasks`);
+			},
+			onInsert: (task) => {
+				showNotification(`New task assigned: ${task.title}`);
+			},
+			onUpdate: (oldTask, newTask) => {
+				if (oldTask.status !== newTask.status) {
+					console.log(`Task ${newTask.title} status changed`);
+				}
+			}
+		}
+	);
 </script>
 ```
 
@@ -384,14 +371,14 @@ If you need manual control over the lifecycle, use the `destroy()` method:
 
 ```svelte
 <script lang="ts">
-  import { TableQuery } from 'spacetimedb-runes';
-  import { onDestroy } from 'svelte';
+	import { TableQuery } from 'spacetimedb-runes';
+	import { onDestroy } from 'svelte';
 
-  const users = new TableQuery('User');
+	const users = new TableQuery('User');
 
-  onDestroy(() => {
-    users.destroy();
-  });
+	onDestroy(() => {
+		users.destroy();
+	});
 </script>
 ```
 
@@ -401,13 +388,13 @@ Monitor connection status reactively:
 
 ```svelte
 <script lang="ts">
-  import { SpacetimeDB } from 'spacetimedb-runes';
+	import { SpacetimeDB } from 'spacetimedb-runes';
 
-  let status = SpacetimeDB.status;
+	let status = SpacetimeDB.status;
 </script>
 
 <div>
-  Status: {$status}
+	Status: {$status}
 </div>
 ```
 
@@ -451,10 +438,10 @@ new TableQuery(
 
 ```typescript
 interface UseQueryCallbacks<RowType> {
-  onInsert?: (row: RowType) => void;
-  onDelete?: (row: RowType) => void;
-  onUpdate?: (oldRow: RowType, newRow: RowType) => void;
-  onInitialSnapshot?: (rows: readonly RowType[]) => void;
+	onInsert?: (row: RowType) => void;
+	onDelete?: (row: RowType) => void;
+	onUpdate?: (oldRow: RowType, newRow: RowType) => void;
+	onInitialSnapshot?: (rows: readonly RowType[]) => void;
 }
 ```
 
